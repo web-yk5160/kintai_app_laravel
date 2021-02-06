@@ -62,7 +62,7 @@
               @foreach ($date as $d)
               <tr>
                 <td>{{ $d->attendance_day }}</td>
-                <td>月</td>
+                <td>{{ $week[$d->attendance_day->dayOfWeek] }}</td>
                 <td>00</td>
                 <td>00</td>
                 <td>00</td>

@@ -11,12 +11,12 @@ class Attendance extends Model
         return $this->belongsTo('App\User');
     }
 
-    public static function getOneMonthDays($firstDay, $lastDay)
+    public static function getOneMonthData($firstDay, $lastDay)
     {
-        // 1ヶ月分の日付を取得
-        $oneMonthDays = self::where('attendance_day', '>=', $firstDay)
+        // 1ヶ月分の勤怠データを取得
+        $oneMonthData = self::where('attendance_day', '>=', $firstDay)
                             ->where('attendance_day', '<=', $lastDay)
                             ->get();
-        return $oneMonthDays;
+        return $oneMonthData;
     }
 }

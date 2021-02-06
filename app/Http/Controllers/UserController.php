@@ -32,6 +32,7 @@ class UserController extends Controller
         $userId = $user->id;
         $firstDay = Carbon::now()->firstOfMonth();
         $lastDay = $firstDay->copy()->endOfMonth();
+        $week = ['日', '月', '火', '水', '木', '金', '土'];
 
         $dbParams = [];
         for ($i = 0; true; $i++) {
@@ -61,11 +62,16 @@ class UserController extends Controller
             });
         }
 
-        $date = Attendance::getOneMonthDays($firstDay, $lastDay);
+        $date = Attendance::getOneMonthData($firstDay, $lastDay);
+        // 曜日表示のため、Carbonインスタンスに変更
+        foreach($date as $d) {
+            $d->attendance_day = Carbon::parse($d->attendance_day);
+        }
 
         $viewParams = [
             'user' => $user,
             'date' => $date,
+            'week' => $week,
         ];
 
         return view('user.show', $viewParams);

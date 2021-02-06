@@ -30,14 +30,24 @@ class UserController extends Controller
 
         $user = auth()->user();
         $userId = $user->id;
-        $firstDay = Carbon::now()->firstOfMonth();
+        // $firstDay = Carbon::now()->firstOfMonth();
+        // $lastDay = $firstDay->copy()->endOfMonth();
+
+        if (empty($request->input('current_day'))) {
+            $currentDay = Carbon::now();
+        } else {
+            $currentDay = Carbon::parse($request->input('current_day'));
+        }
+        $firstDay = $currentDay->copy()->firstOfMonth();
         $lastDay = $firstDay->copy()->endOfMonth();
+        $lastMonth = $currentDay->copy()->subMonthNoOverflow()->format('Y-m-d');
+        $nextMonth = $currentDay->copy()->addMonthNoOverflow()->format('Y-m-d');
         $week = ['日', '月', '火', '水', '木', '金', '土'];
 
         $dbParams = [];
         for ($i = 0; true; $i++) {
             $day = $firstDay->addDays($i);
-            $firstDay = Carbon::now()->firstOfMonth();
+            $firstDay = $currentDay->copy()->firstOfMonth();
             // テーブルに値が存在しないか確認
             if (!DB::table('attendances')->where('attendance_day', $day)->where('user_id', $userId)->exists()) {
                 $data = [
@@ -72,6 +82,8 @@ class UserController extends Controller
             'user' => $user,
             'date' => $date,
             'week' => $week,
+            'lastMonth' => $lastMonth,
+            'nextMonth' => $nextMonth,
         ];
 
         return view('user.show', $viewParams);

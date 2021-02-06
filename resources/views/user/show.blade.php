@@ -15,7 +15,11 @@
           <table class="table table-bordered table-striped table-condensed">
             <thead>
               <tr>
-                <th colspan="1">←時間管理表→</th>
+                <th colspan="1">
+                  <a href="/show?current_day={{ $lastMonth }}" class="btn-sm btn-primary">←</a>
+                  &emsp;時間管理表&emsp;
+                  <a href="/show?current_day={{ $nextMonth }}" class="btn-sm btn-primary">→</a>
+                </th>
                 <th>
                   指定勤務開始時間
                   指定勤務終了時間
@@ -46,14 +50,15 @@
               <tr>
                 <th rowspan="2">日付</th>
                 <th rowspan="2">曜日</th>
-                <th colspan="2">出社</th>
-                <th colspan="2">退社</th>
+                <th colspan="3">出社</th>
+                <th colspan="3">退社</th>
                 <th rowspan="2">在社時間</th>
                 <th rowspan="2">備考</th>
               </tr>
               <tr>
                 <th>時</th>
                 <th>分</th>
+                <th></th>
                 <th>時</th>
                 <th>分</th>
               </tr>
@@ -61,14 +66,26 @@
             <tbody>
               @foreach ($date as $d)
               <tr>
-                <td>{{ $d->attendance_day }}</td>
+                <!-- 日付 -->
+                <td>{{ $d->attendance_day->format('Y-m-d') }}</td>
+                <!-- 曜日 -->
                 <td>{{ $week[$d->attendance_day->dayOfWeek] }}</td>
-                <td>00</td>
-                <td>00</td>
-                <td>00</td>
-                <td>00</td>
-                <td>00</td>
-                <td>00</td>
+                <!-- 出社時間(hours) -->
+                <td></td>
+                <!-- 出社時間(minutes) -->
+                <td></td>
+                <!-- 出社ボタン -->
+                <td></td>
+                <!-- 退社時間(hours) -->
+                <td></td>
+                <!-- 退社時間(minutes) -->
+                <td></td>
+                <!-- 退社ボタン -->
+                <td></td>
+                <!-- 在社時間 -->
+                <td></td>
+                <!-- 備考 -->
+                <td></td>
               </tr>
               @endforeach
             </tbody>

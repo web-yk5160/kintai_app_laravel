@@ -8,9 +8,16 @@ use App\HTTP\Requests\UserRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Attendance;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
+
+    public function __construct(){
+        $this->middleware('auth');
+    }
 
     /**
      * Display the specified resource.
@@ -18,20 +25,49 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show(Request $request)
     {
-        $user = auth()->user();
-        $beginningOfMonth = Carbon::now()->firstOfMonth();
-        $endOfMonth = $beginningOfMonth->copy()->endOfMonth();
 
+        $user = auth()->user();
+        $userId = $user->id;
+        $firstDay = Carbon::now()->firstOfMonth();
+        $lastDay = $firstDay->copy()->endOfMonth();
+
+        $dbParams = [];
         for ($i = 0; true; $i++) {
-            $date = $beginningOfMonth->addDays($i);
-            if ($date > $endOfMonth) {
+            $day = $firstDay->addDays($i);
+            $firstDay = Carbon::now()->firstOfMonth();
+            // テーブルに値が存在しないか確認
+            if (!DB::table('attendances')->where('attendance_day', $day)->where('user_id', $userId)->exists()) {
+                $data = [
+                    'user_id' => $userId,
+                    'attendance_day' => $day,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ];
+            }
+            if ($day > $lastDay) {
                 break;
+            }
+
+            if (!empty($data)) {
+                array_push($dbParams, $data);
             }
         }
 
-        $viewParams = ['user' => $user];
+        if (!empty($dbParams)) {
+            DB::transaction(function () use ($dbParams) {
+                DB::table('attendances')->insert($dbParams);
+            });
+        }
+
+        $date = Attendance::getOneMonthDays($firstDay, $lastDay);
+
+        $viewParams = [
+            'user' => $user,
+            'date' => $date,
+        ];
+
         return view('user.show', $viewParams);
     }
 

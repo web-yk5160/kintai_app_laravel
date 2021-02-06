@@ -59,8 +59,9 @@
               </tr>
             </thead>
             <tbody>
+              @foreach ($date as $d)
               <tr>
-                <td>11/1</td>
+                <td>{{ $d->attendance_day }}</td>
                 <td>月</td>
                 <td>00</td>
                 <td>00</td>
@@ -69,6 +70,7 @@
                 <td>00</td>
                 <td>00</td>
               </tr>
+              @endforeach
             </tbody>
           </table>
         </div>

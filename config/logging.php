@@ -91,6 +91,13 @@ return [
             'level' => 'debug',
         ],
 
+        'user-register' => [
+          'driver' => 'daily',
+          'level' => 'debug',
+          'path' => storage_path('logs/laravel.log'),
+          'days' => 90,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

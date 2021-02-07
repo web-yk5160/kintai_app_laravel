@@ -21,22 +21,22 @@
                   <a href="/show?current_day={{ $nextMonth }}" class="btn-sm btn-primary">→</a>
                 </th>
                 <th>
-                  指定勤務開始時間
-                  指定勤務終了時間
+                  指定勤務開始時間: {{ $user->designate_start_time }}<br>
+                  指定勤務終了時間: {{ $user->designate_end_time }}
                 </th>
-                <th colspan="3">基本時間</th>
-                <th>初日</th>
+                <th colspan="3">基本時間: {{ $user->basic_work_time }}</th>
+                <th>初日: {{ $firstDay->format('m/d') }}</th>
               </tr>
 
               <tr>
-                <th>所属</th>
-                <th>氏名</th>
+                <th>所属: {{ $user->belong }}</th>
+                <th>氏名: {{ $user->name }}</th>
                 <th>コード</th>
                 <th>2222</th>
-                <th>出勤日数
+                <th>出勤日数:
                   0日
                 </th>
-                <th>締め</th>
+                <th>締め: {{ $lastDay->format('m/d') }}</th>
               </tr>
             </thead>
           </table>
@@ -71,15 +71,34 @@
                 <!-- 曜日 -->
                 <td>{{ $week[$d->attendance_day->dayOfWeek] }}</td>
                 <!-- 出社時間(hours) -->
-                <td></td>
+                <td>
+                  @if ($d->start_time !== null)
+                  {{ $d->start_time->format('H') }}
+                  @endif
+                </td>
                 <!-- 出社時間(minutes) -->
-                <td></td>
+                <td>
+                  @if ($d->start_time !== null)
+                  {{ $d->start_time->format('i') }}
+                  @endif
+                </td>
                 <!-- 出社ボタン -->
-                <td></td>
+                <td>
+                  @if ($today == $d->attendance_day && $d->start_time === null)
+                  <form action="{{ route('start_time') }}" method="post">
+                    @csrf
+                    <input type="submit" value="出社" class="btn btn-primary">
+                  </form>
+                  @endif
+                </td>
                 <!-- 退社時間(hours) -->
                 <td></td>
                 <!-- 退社時間(minutes) -->
-                <td></td>
+                <td>
+                  @if ($today == $d->attendance_day)
+                  <a href="#" class="btn btn-primary">退社</a>
+                  @endif
+                </td>
                 <!-- 退社ボタン -->
                 <td></td>
                 <!-- 在社時間 -->

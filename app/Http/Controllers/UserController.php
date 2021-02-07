@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use Illuminate\Http\Request;
-use App\HTTP\Requests\UserRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Attendance;
+use Illuminate\Http\Request;
+use App\HTTP\Requests\UserRequest;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
@@ -30,14 +32,18 @@ class UserController extends Controller
 
         $user = auth()->user();
         $userId = $user->id;
-        // $firstDay = Carbon::now()->firstOfMonth();
-        // $lastDay = $firstDay->copy()->endOfMonth();
 
         if (empty($request->input('current_day'))) {
             $currentDay = Carbon::now();
         } else {
+            // クエリパラメータありならバリデーション
+            $validator = $this->validator($request->query());
+            if ($validator->fails()) {
+                return redirect('/show');
+            }
             $currentDay = Carbon::parse($request->input('current_day'));
         }
+        $today = Carbon::today();
         $firstDay = $currentDay->copy()->firstOfMonth();
         $lastDay = $firstDay->copy()->endOfMonth();
         $lastMonth = $currentDay->copy()->subMonthNoOverflow()->format('Y-m-d');
@@ -76,6 +82,7 @@ class UserController extends Controller
         // 曜日表示のため、Carbonインスタンスに変更
         foreach($date as $d) {
             $d->attendance_day = Carbon::parse($d->attendance_day);
+            $d->start_time = $d->start_time ? Carbon::parse($d->start_time) : null;
         }
 
         $viewParams = [
@@ -84,6 +91,9 @@ class UserController extends Controller
             'week' => $week,
             'lastMonth' => $lastMonth,
             'nextMonth' => $nextMonth,
+            'firstDay' => $firstDay,
+            'lastDay' => $lastDay,
+            'today' => $today,
         ];
 
         return view('user.show', $viewParams);
@@ -116,8 +126,24 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'belong' => $validated['belong'],
-            'password' => $validated['password'],
+            'password' => Hash::make($validated['password']),
         ]);
         return redirect('/show');
     }
+
+    // private
+    /**
+     * クエリパラメータチェック.
+     *
+    * @param  array  $data
+    * @return \Illuminate\Contracts\Validation\Validator
+    */
+    public function validator(array $data)
+    {
+        $validator = Validator::make($data, [
+            'current_day' => 'date'
+        ]);
+        return $validator;
+    }
+
 }

@@ -83,6 +83,7 @@ class UserController extends Controller
         foreach($date as $d) {
             $d->attendance_day = Carbon::parse($d->attendance_day);
             $d->start_time = $d->start_time ? Carbon::parse($d->start_time) : null;
+            $d->end_time = $d->end_time ? Carbon::parse($d->end_time) : null;
         }
 
         $viewParams = [

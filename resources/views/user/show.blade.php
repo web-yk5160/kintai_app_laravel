@@ -92,17 +92,32 @@
                   @endif
                 </td>
                 <!-- 退社時間(hours) -->
-                <td></td>
+                <td>
+                  @if($d->end_time !== null)
+                  {{ $d->end_time->format('H') }}
+                  @endif
+                </td>
                 <!-- 退社時間(minutes) -->
                 <td>
-                  @if ($today == $d->attendance_day)
-                  <a href="#" class="btn btn-primary">退社</a>
+                  @if($d->end_time !== null)
+                  {{ $d->end_time->format('i') }}
                   @endif
                 </td>
                 <!-- 退社ボタン -->
-                <td></td>
+                <td>
+                  @if ($today == $d->attendance_day && $d->start_time !== null && $d->end_time === null)
+                  <form action="{{ route('end_time') }}" method="post">
+                    @csrf
+                    <input type="submit" value="退社" class="btn btn-primary">
+                  </form>
+                  @endif
+                </td>
                 <!-- 在社時間 -->
-                <td></td>
+                <td>
+                  @if ($d->start_time !== null && $d->end_time !== null)
+                  {{ $d->start_time->diffInSeconds($d->end_time) }}
+                  @endif
+                </td>
                 <!-- 備考 -->
                 <td></td>
               </tr>
